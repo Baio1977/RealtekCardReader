@@ -33,8 +33,16 @@ jobs:
               with:
                 name: RealtekCardReader
                 path: build/*/*.zip
-
-    # Analyze the kext
+                
+            - name: Upload to Release
+              if: github.event_name == 'release'
+              uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
+              with:
+                 repo_token: ${{ secrets.GITHUB_TOKEN }}
+                 file: build/*/*.zip
+                 tag: ${{ github.ref }}
+                 file_glob: true    # Analyze the kext
+          
     analyze:
         name: Analyze
         runs-on: macos-latest

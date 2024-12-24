@@ -15,7 +15,7 @@ jobs:
     # Build the kext
     build:
         name: Build
-        runs-on: macos-latest
+        runs-on: macos-13
         steps:
             # Checkout the card reader repo
             - uses: actions/checkout@v4.2.2
@@ -37,7 +37,7 @@ jobs:
     # Analyze the kext
     analyze:
         name: Analyze
-        runs-on: macos-latest
+        runs-on: macos-13
         steps:
             # Checkout the card reader repo
             - uses: actions/checkout@v4.2.2

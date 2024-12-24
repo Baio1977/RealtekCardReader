@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A42F74C02637AC33003E5AB9"
-               BuildableName = "ECEnabler.kext"
-               BlueprintName = "ECEnabler"
-               ReferencedContainer = "container:ECEnabler.xcodeproj">
+               BuildableName = "RealtekCardReader.kext"
+               BlueprintName = "RealtekCardReader"
+               ReferencedContainer = "container:RealtekCardReader.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -51,9 +51,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A42F74C02637AC33003E5AB9"
-            BuildableName = "ECEnabler.kext"
-            BlueprintName = "ECEnabler"
-            ReferencedContainer = "container:ECEnabler.xcodeproj">
+            BuildableName = "RealtekCardReader.kext"
+            BlueprintName = "RealtekCardReader"
+            ReferencedContainer = "container:RealtekCardReader.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

@@ -15,12 +15,12 @@ jobs:
     # Build the kext
     build:
         name: Build
-        runs-on: macos-latest
+        runs-on: macos-13
         steps:
             # Checkout the card reader repo
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4.2.2
             # Checkout the MacKernelSDK repo
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4.2.2
               with:
                 repository: acidanthera/MacKernelSDK
                 path: MacKernelSDK
@@ -37,12 +37,12 @@ jobs:
     # Analyze the kext
     analyze:
         name: Analyze
-        runs-on: macos-latest
+        runs-on: macos-13
         steps:
             # Checkout the card reader repo
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4.2.2
             # Checkout the MacKernelSDK repo
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4.2.2
               with:
                 repository: acidanthera/MacKernelSDK
                 path: MacKernelSDK

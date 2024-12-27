@@ -1,3 +1,5 @@
+[![CI-RealtekCardReader](https://github.com/Baio1977/RealtekCardReader/actions/workflows/main.yml/badge.svg)](https://github.com/Baio1977/RealtekCardReader/actions/workflows/main.yml)
+
 #  Realtek Card Reader Driver for macOS
 Unleash the full potential of your SDXC UHS-I cards
 

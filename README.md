@@ -32,6 +32,7 @@ It uses the Linux driver as a reference implementation but is written from scrat
 - **Known Issues:** [Link](Docs/KnownIssues.md)
 
 ## Supported Systems
+- macOS Tahoe  
 - macOS Sequoia  
 - macOS Sonoma  
 - macOS Ventura

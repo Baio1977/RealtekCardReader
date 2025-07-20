@@ -17,7 +17,7 @@ It uses the Linux driver as a reference implementation but is written from scrat
 - Device-independent SD host driver stack
 
 #### Notes:
-- [RealtekCardReaderFriend](https://github.com/Baio1977/RealtekCardReaderFriend)/) is required to enable this feature as of v0.9.8.
+- [RealtekCardReaderFriend](https://github.com/Baio1977/RealtekCardReaderFriend) is required to enable this feature as of v0.9.8.
 
 ## Limitations
 - MMC cards are not supported

@@ -18,9 +18,9 @@ jobs:
         runs-on: macos-13
         steps:
             # Checkout the card reader repo
-            - uses: actions/checkout@v4.2.2
+            - uses: actions/checkout@v6.0.1
             # Checkout the MacKernelSDK repo
-            - uses: actions/checkout@v4.2.2
+            - uses: actions/checkout@v6.0.1
               with:
                 repository: acidanthera/MacKernelSDK
                 path: MacKernelSDK
@@ -29,7 +29,7 @@ jobs:
             - run: xcodebuild -jobs 3 -configuration Release
             # Upload the driver
             - name: Upload to Artifacts
-              uses: actions/upload-artifact@v4.6.2
+              uses: actions/upload-artifact@v6
               with:
                 name: Artifacts
                 path: build/*/*.zip
@@ -48,9 +48,9 @@ jobs:
         runs-on: macos-13
         steps:
             # Checkout the card reader repo
-            - uses: actions/checkout@v4.2.2
+            - uses: actions/checkout@v6.0.1
             # Checkout the MacKernelSDK repo
-            - uses: actions/checkout@v4.2.2
+            - uses: actions/checkout@v6.0.1
               with:
                 repository: acidanthera/MacKernelSDK
                 path: MacKernelSDK

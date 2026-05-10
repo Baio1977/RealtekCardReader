@@ -1,7 +1,7 @@
 #  Changelog
 
 #### v0.9.8 Beta
-- Add support for macOS HighSierra - Sonoma - Sequoia.
+- Add support for macOS High Sierra, Sonoma, Sequoia and Tahoe.
 - Update Changelog.
 - Update Readme.
 - Create main.yml.

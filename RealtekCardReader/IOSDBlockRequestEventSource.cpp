@@ -6,6 +6,7 @@
 //
 
 #include "IOSDBlockRequestEventSource.hpp"
+#include "IOSDHostDriver.hpp"
 #include "Debug.hpp"
 
 //
@@ -38,6 +39,20 @@ bool IOSDBlockRequestEventSource::checkForWork()
     if (this->pendingRequests->isEmpty())
     {
         pinfo("The request queue is empty.");
+        
+        return false;
+    }
+    
+    // Guard: Do not process any request while a card insertion event is pending
+    // The host driver enables this event source and the attach event source at the same time
+    // when a card is inserted, and this event source is registered with the work loop first.
+    // Processing a request before the card is attached would access a null card.
+    // The host driver re-enables this event source once the attach event has been processed.
+    auto driver = OSDynamicCast(IOSDHostDriver, this->owner);
+    
+    if (driver != nullptr && driver->isCardAttachPending())
+    {
+        pinfo("A card insertion event is pending. Will process pending requests once the card is attached.");
         
         return false;
     }

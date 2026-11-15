@@ -534,17 +534,35 @@ void RealtekCardReaderController::prepareToWakeUp()
         // Notify the host device to re-attach the card
         pinfo("Detected a card when the controller wakes up. Will notify the host device.");
         
-        psoftassert(this->onSDCardInsertedSync(IOSDCard::EventOption::kPowerManagementContext) == kIOReturnSuccess,
-                    "Failed to attach the card when the controller wakes up.");
+        // Do NOT wait for the host driver here.
+        // This function runs in the power management callback, and the kernel panics
+        // if the callback does not return within 180 seconds. If the card detect bit is bogus
+        // or the card cannot be initialized, a synchronous wait could block for too long.
+        // Notify the host driver asynchronously (the completion is optional) and return immediately.
+        auto action = [&]() -> IOReturn
+        {
+            this->onSDCardInsertedGated(nullptr, IOSDCard::EventOption::kPowerManagementContext);
+            return kIOReturnSuccess;
+        };
+        
+        psoftassert(IOCommandGateRunAction(this->commandGate, action) == kIOReturnSuccess,
+                    "Failed to schedule the card attachment when the controller wakes up.");
     }
     else if (this->currentCardStatus)
     {
         // Notify the host device to detach the card that had been removed while the computer was sleeping
         pinfo("The card was present when the controller slept but had been removed before the controller waked up.");
         
-        // In this case, pretend that we are the interrupt service routine
-        psoftassert(this->onSDCardRemovedSync(IOSDCard::EventOption::kInterruptContext) == kIOReturnSuccess,
-                    "Failed to detach the card when the controller wakes up.");
+        // In this case, pretend that we are the interrupt service routine.
+        // Same reasoning as above: never block the power management callback.
+        auto action = [&]() -> IOReturn
+        {
+            this->onSDCardRemovedGated(nullptr, IOSDCard::EventOption::kInterruptContext);
+            return kIOReturnSuccess;
+        };
+        
+        psoftassert(IOCommandGateRunAction(this->commandGate, action) == kIOReturnSuccess,
+                    "Failed to schedule the card detachment when the controller wakes up.");
     }
     else
     {

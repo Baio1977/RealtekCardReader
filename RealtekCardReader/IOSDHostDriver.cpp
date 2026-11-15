@@ -126,6 +126,14 @@ UInt32 IOSDHostDriver::transformBlockOffsetIfNecessary(UInt64 block)
 ///
 IOReturn IOSDHostDriver::processReadBlockRequest(IOSDBlockRequest* request)
 {
+    // Guard: The card may have been removed or failed to initialize
+    if (UNLIKELY(this->card == nullptr))
+    {
+        perr("The card is not attached. The request is rejected.");
+        
+        return kIOReturnNoMedia;
+    }
+    
     pinfo("Processing the request that reads a single block...");
     
     auto creq = this->host->getRequestFactory().CMD17(this->transformBlockOffsetIfNecessary(request->getBlockOffset()), request->getMemoryDescriptor());
@@ -143,6 +151,14 @@ IOReturn IOSDHostDriver::processReadBlockRequest(IOSDBlockRequest* request)
 ///
 IOReturn IOSDHostDriver::processReadBlocksRequest(IOSDBlockRequest* request)
 {
+    // Guard: The card may have been removed or failed to initialize
+    if (UNLIKELY(this->card == nullptr))
+    {
+        perr("The card is not attached. The request is rejected.");
+        
+        return kIOReturnNoMedia;
+    }
+    
     // Guard: Check if the driver should separate the incoming request
     if (UNLIKELY(UserConfigs::Card::SeparateAccessBlocksRequest))
     {
@@ -189,6 +205,14 @@ IOReturn IOSDHostDriver::processReadBlocksRequestSeparately(IOSDBlockRequest* re
 ///
 IOReturn IOSDHostDriver::processWriteBlockRequest(IOSDBlockRequest* request)
 {
+    // Guard: The card may have been removed or failed to initialize
+    if (UNLIKELY(this->card == nullptr))
+    {
+        perr("The card is not attached. The request is rejected.");
+        
+        return kIOReturnNoMedia;
+    }
+    
     pinfo("Processing the request that writes a single block...");
     
     auto creq = this->host->getRequestFactory().CMD24(this->transformBlockOffsetIfNecessary(request->getBlockOffset()), request->getMemoryDescriptor());
@@ -206,6 +230,14 @@ IOReturn IOSDHostDriver::processWriteBlockRequest(IOSDBlockRequest* request)
 ///
 IOReturn IOSDHostDriver::processWriteBlocksRequest(IOSDBlockRequest* request)
 {
+    // Guard: The card may have been removed or failed to initialize
+    if (UNLIKELY(this->card == nullptr))
+    {
+        perr("The card is not attached. The request is rejected.");
+        
+        return kIOReturnNoMedia;
+    }
+    
     // Guard: Check if the driver should separate the incoming request
     if (UNLIKELY(UserConfigs::Card::SeparateAccessBlocksRequest))
     {
@@ -1843,6 +1875,26 @@ void IOSDHostDriver::attachCard(IOSDCard::Completion* completion, IOSDCard::Even
 
     pinfo("Attaching the SD card with completion at 0x%08x%08x and event options %u...", KPTR(completion), options.flatten());
     
+    // Guard: Ignore the request if a card has already been attached
+    // The attach event may be raised by more than one source, e.g. the interrupt service routine,
+    // the power management routine and the routine that checks the card when the driver starts.
+    // Attaching the card twice triggers an assertion in `attachCardAtFrequency()` and panics the kernel.
+    if (this->card != nullptr)
+    {
+        pinfo("The card has already been attached. Ignoring the duplicated attach request.");
+        
+        OSDictionary* existingCharacteristics = this->card->getCardCharacteristics();
+        
+        IOSDCard::complete(completion, kIOReturnSuccess, existingCharacteristics);
+        
+        OSSafeReleaseNULL(existingCharacteristics);
+        
+        // Resume processing the block requests that were deferred by this insertion event
+        this->queueEventSource->enable();
+        
+        return;
+    }
+    
     ClosedRange<UInt32> range = this->host->getHostClockRange();
     
     OSDictionary* characteristics = nullptr;
@@ -1935,6 +1987,10 @@ void IOSDHostDriver::attachCard(IOSDCard::Completion* completion, IOSDCard::Even
     }
     
     pinfo("The card insertion event has been processed. Status = 0x%08x.", status);
+    
+    // Resume processing the block requests submitted while the card was being attached
+    // If the card failed to initialize, pending requests are completed with `kIOReturnNoMedia`.
+    this->queueEventSource->enable();
     
     // All done: Notify the client
     IOSDCard::complete(completion, status, characteristics);

@@ -424,6 +424,23 @@ private:
     void finalizeBlockRequest(IOSDBlockRequest* request);
     
     //
+    // MARK: - Query Card Event State
+    //
+    
+public:
+    ///
+    /// Check whether a card insertion event is waiting to be processed by the processor work loop
+    ///
+    /// @return `true` if the attach event source is enabled, i.e. the card is about to be attached.
+    /// @note This function is invoked by the queue event source on the processor work loop,
+    ///       so that pending block requests are not processed before the card is attached.
+    ///
+    inline bool isCardAttachPending() const
+    {
+        return this->attachCardEventSource != nullptr && this->attachCardEventSource->isEnabled();
+    }
+    
+    //
     // MARK: - Query Host Properties
     //
     

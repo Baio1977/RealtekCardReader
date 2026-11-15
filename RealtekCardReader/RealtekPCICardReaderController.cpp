@@ -2175,6 +2175,11 @@ void RealtekPCICardReaderController::prepareToWakeUp()
     // Initialize the hardware
     if (this->initHardwareCommon() == kIOReturnSuccess)
     {
+        // The card detect bit (BIPR::kSDExists) is unreliable right after the controller wakes up:
+        // it reports the opposite of the actual slot state and settles in less than 200 ms.
+        // Wait until it is stable, otherwise a card may be missed or a non-existent card may be attached.
+        IOSleep(250);
+        
         // Attach the card if present
         super::prepareToWakeUp();
         
